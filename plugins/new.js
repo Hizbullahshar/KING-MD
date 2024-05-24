@@ -1,4 +1,4 @@
-const { sck, sck1,cmd, cmdBuffer, jsonformat, fetchJson, botpic, ffmpeg, TelegraPh, RandomXP, tlang, warndb, sleep,getAdmin,getBuffer, prefix } = require('../lib')
+const { sck, sck1,cmd, cmdBuffer, jsonformat, fetchJson, botpic, ffmpeg, TelegraPh, RandomXP, warndb, sleep,getAdmin,getBuffer, prefix } = require('../lib')
 const { mediafire } = require("../lib/mediafire.js");
 const googleTTS = require("google-tts-api");
 const ytdl = require('ytdl-secktor')
@@ -15,6 +15,36 @@ var videotime = 60000 // 1000 min
 var dlsize = 1000 // 1000mb
 const rapidApiKey = 'bcdeae8e6bmsh3af33e24439971ep106cd9jsnfc28157e482b';
 
+//---------------------------------------------------------------------------
+
+
+
+//---------------------------------------------------------------------------
+cmd({
+    pattern: "natural",
+    desc: "Set wallpaper",
+    category: "wallpaper",
+    filename: __filename,
+},
+async(Void, citel, text) => {
+        
+        const response = await fetch('https://api.unsplash.com/photos/random?client_id=72utkjatCBC-PDcx7-Kcvgod7-QOFAm2fXwEeW8b8cc');
+const data = await response.json();
+  const url =data.urls.regular
+  //citel.reply ('url here :'+url);
+
+                let buttonMessaged = {
+                    image: { url: url },
+                    caption: `*╰┈➤ 𝙶𝙴𝙽𝙴𝚁𝙰𝚃𝙴𝙳 𝙱𝚈 ${Config.botname}*`,
+                    footer: tlang().footer,
+                    headerType: 4,
+                   
+                };
+                return await Void.sendMessage(citel.chat, buttonMessaged , {quoted : citel});
+
+
+}
+   )
 //---------------------------------------------------------------------------
 cmd({
     pattern: "walp",
