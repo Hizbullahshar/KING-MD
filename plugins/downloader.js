@@ -25,6 +25,7 @@ const fs  = require('fs-extra');
 const axios= require('axios');
 var videotime = 3600 // 30 min
 var dlsize = 100 // 100mb
+let cap = `_╰┈➤ 𝙶𝙴𝙽𝙴𝚁𝙰𝚃𝙴𝙳 𝙱𝚈 ${Config.botname}_`
     //---------------------------------------------------------------------------
 cmd({
             pattern: "tgs",
@@ -106,45 +107,56 @@ cmd({
   pattern: 'fb',
   alias:'facebook',
   fromMe: false,
-  category:'downloader',
-  react:'🔥',
+  catergory:'downloader',
+  react:'⚔️',
   desc: 'Download fb video without watermark',
 },
 async (Void,citel, text,) => {
 	try {
-       let text = text.split(" ")[0].trim();
-       if (!text || !text.startsWith("https://")) {
-         return await citel.reply(
-           "*_Please provide a valid Facebook Video URL._*\n*Example: .fb https://www.facebook.com/watch/?v=2018727118289093_*"
-         );
-       }
-       let video = await axios(
-         "https://api-smd.onrender.com/api/fbdown?url=" + text
-       );
-       if (!video || !video.status) {
-         return await citel.reply("*Invalid Video URL!*");
-       }
-       return await Void.sendMessage(
-         citel.chat,
-         {
-           video: {
-             url: video.result.Normal_video, // Assuming you want the normal quality video
-           },
-           caption: Config.botname,
-         },
-         {
-           quoted: citel,
-         }
-       );
-     } catch (error) {
+  let url = text.split(' ')[0].trim();
+
+  if (!url || !url.startsWith("https://")) {
+    return await citel.reply('Please provide a fb video URL.');
+  }
+
+    let {data}= await axios.get(`https://api-smd.vercel.app/api/fb?url=${encodeURIComponent(url)}`);
+
+   if(! data || !data.result ) return await citel.reply("no results found")
+
     await 
-Void.sendMessage(error + "\n\nCommand: facebook",
-         error,
-         "*_Video not found!_*"
-       );
-     }
-   }
- );
+Void.sendMessage(citel.chat, {video : { url :data.result.urls[1].url } , },)
+  } catch (error) {
+    citel.reply(`Error: ${error.message || error}`);
+  }
+});
+
+cmd({
+  pattern: 'fb2',
+  alias:'facebook2',
+  fromMe: false,
+  catergory:'downloader',
+  react:'⚔️',
+  desc: 'Download fb video without watermark',
+},
+async (Void,citel, text,) => {
+	try {
+  let url = text.split(" ")[0].trim();
+
+  if (!url || !url.startsWith("https://")) {
+    return citel.reply('Please provide a fb video URL.');
+  }
+
+    let {data}= await axios.get(`https://api.maher-zubair.tech/download/fb?url=${encodeURIComponent(url)}`);
+
+   if(! data || !data.result ) { return citel.reply("no results found");
+			       }
+    await 
+Void.sendMessage(citel.chat, {video : { url :data.result.urls[1].url } , },)
+  } catch (error) {
+    citel.reply(`Error: ${error.message || error}`);
+  }
+});
+
 
 //---------------------------------------------------------------------------
 cmd({
@@ -154,44 +166,32 @@ cmd({
             filename: __filename,
             use: '<text|image name>',
         },
-        async(Void, citel, text) => {
-            if (!text) return reply("What picture are you looking for?") && Void.sendMessage(citel.chat, {
-                react: {
-                    text: '❌',
-                    key: citel.key
-                }
-            })
-            try {
-                anu = await pinterest(text)
-                result = anu[Math.floor(Math.random() * anu.length)]
-                let buttonMessage = {
-                    image: {
-                        url: result
-                    },
-                    caption: ` `,
-                    footer: tlang().footer,
-                    headerType: 4,
-                    contextInfo: {
-                        externalAdReply: {
-                            title: `Here you go✨`,
-                            body: Config.ownername,
-                            thumbnail: log0,
-                            mediaType: 2,
-                            mediaUrl: ``,
-                            sourceUrl: gurl,
-                        }
+    async(Void, citel, text) => {
+        if (!text) return citel.send(`What picture are you looking for?`)
+        citel.reply('*𝙳𝙾𝚆𝙽𝙻𝙾𝙰𝙳𝙸𝙽𝙶:* '+text)
+        try {
+            let anu = await pinterest(text)
+            let result = anu[Math.floor(Math.random() * anu.length)]
+            let buttonMessage = {
+                image: { url: result },
+                caption: cap ,
+                //footer: tlang().footer,
+                headerType: 4,
+                contextInfo: {
+                    externalAdReply: {
+                        title: Config.botname,
+                        body: `ᴘɪɴᴛᴇʀᴇsᴛ ᴅᴏᴡɴʟᴏᴀᴅᴇʀ`,
+                        thumbnail: log0,
+                        mediaType: 2,
+                        mediaUrl: ``,
+                        sourceUrl: gurl
                     }
                 }
-                return Void.sendMessage(citel.chat, buttonMessage, {
-                    quoted: citel
-                })
-            } catch (error) {
-                console.log(error)
             }
-        })
+            return Void.sendMessage(citel.chat, buttonMessage, {  quoted: citel })
+        } catch (e) {  return citel.reply(`*_Give Me Query_*\n*_Ex ${prefix}pint crown_*`)  }
+    })
 //---------------------------------------------------------------------------
-
-
 cmd({
             pattern: "tiktok2",
 	    alias :  ['ttdl','tiktdl'],
@@ -226,6 +226,40 @@ let buttonMessage =
 } catch (error) {return citel.reply("Error While Downloading Your Video") }
 
 })
+
+  //---------------------------------------------------------------------------
+cmd({
+            pattern: "gdrive",
+            desc: "Downloads google drive Via Url.",
+            category: "downloader",
+            filename: __filename,
+            use: 'add tiktok url.'
+        },
+
+async(Void, citel, text) => {
+if (!text) return citel.send('Uhh Please, Give me  Google Drive Url') 
+if (!(text && text.match(/drive\.google/i))) citel.send('Uhh Please, Give me Valid Google Drive Url')
+let id =(text.match(/\/?id=(.+)/i) || text.match(/\/d\/(.*?)\//))[1]
+if (!id) return citel.reply('ID Not Found');
+try {
+	GDriveDl(id).then(async (res) => 
+	{ 
+                let data  =  "*File Name :* "+ res.fileName ;
+	            data +="\n*File Size :* " + res.size +"Mb" ;
+	            data +="\n*File Type :* "+ res.mimetype.split('/')[1] +  "\n" + name.caption;
+	        let buttonMessage = 
+		{
+			document: { url: res.downloadUrl },
+			fileName: res.fileName,
+			mimetype: res.mimetype,
+			caption : "\t  *GOOGLE DRIVE DOWNLOADER*  \n" + data
+		}
+	        return await Void.sendMessage(citel.chat,buttonMessage, { quoted: citel })
+	})
+ } catch (error) {  return citel.reply("```File Not Found```" ) }
+	
+})
+
 
   //---------------------------------------------------------------------------
 cmd({

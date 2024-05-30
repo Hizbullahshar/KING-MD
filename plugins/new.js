@@ -1,4 +1,4 @@
-const { sck, sck1,cmd, cmdBuffer, jsonformat, fetchJson, botpic, ffmpeg, TelegraPh, RandomXP, warndb, sleep,getAdmin,getBuffer, prefix } = require('../lib')
+const { sck, sck1,cmd, cmdBuffer, jsonformat, fetchJson, tlang, runtime, botpic, ffmpeg, TelegraPh, RandomXP, warndb, sleep,getAdmin,getBuffer, prefix } = require('../lib')
 const { mediafire } = require("../lib/mediafire.js");
 const googleTTS = require("google-tts-api");
 const ytdl = require('ytdl-secktor')
@@ -7,6 +7,7 @@ const util = require('util');
 const axios = require('axios');
 const moment = require("moment-timezone");
 const Levels = require("discord-xp");
+const speed = require('performance-now')
 const fetch = require('node-fetch');
 const { Sticker, createSticker, StickerTypes } = require("wa-sticker-formatter");
 const Config = require('../config')
@@ -16,7 +17,378 @@ var dlsize = 1000 // 1000mb
 const rapidApiKey = 'bcdeae8e6bmsh3af33e24439971ep106cd9jsnfc28157e482b';
 
 //---------------------------------------------------------------------------
+cmd({
+        pattern: "link",
+        alias: ["ytube", "ytchannel", "myyt"],
+        desc: "Sends info about My Ytube Channel __CheckOut :_ www.Youtube.com/c/SuhailTechInfo",
+        category: "user",
+        filename: __filename,
+    },
+    async(Void, citel) => {
+       
+	let cap = `
+╔══════════════════════════╗
+  ☞𝐒𝐔𝐏𝐏𝐎𝐑𝐓 𝐘𝐎𝐔𝐓𝐔𝐁𝐄 𝐂𝐇𝐀𝐍𝐍𝐄𝐋☜
+╚══════════════════════════╝\n
+*⭐ Youtube Content :* How To Create Whatsapp Bot
+*🍽️ Total Subscriber:* 36 Subscribers
+*🍁 Channel Link:* _https://youtube.com/=1_\n
+╭━━━━━━━━━━━━━━━━━━━━╮
+┇  ╔═╦╗╔╦╗╔═╦═╦╦╦╦╗╔═╗
+┇  ║╚╣║║║╚╣╚╣╔╣╔╣║╚╣═╣
+┇  ╠╗║╚╝║║╠╗║╚╣║║║║║═╣
+┇  ╚═╩══╩═╩═╩═╩╝╚╩═╩═╝
+╰━━━━━━━━━━━━━━━━━━━━╯
+𝐏𝐋𝐄𝐀𝐒𝐄 𝐒𝐔𝐏𝐏𝐎𝐑𝐓 𝐌𝐘 𝐘𝐎𝐔𝐓𝐔𝐁𝐄 𝐂𝐇𝐀𝐍𝐍𝐄𝐋*`
+	
+	
+        let buttonMessaged = {
+            image: { url: await botpic() },
+            caption: cap,
+            footer: tlang().footer,
+            headerType: 4,
+            contextInfo: {
+                externalAdReply: {
+		showAdAttribution: true,
+                    title: "KING-MD",
+                    body: "Support",
+		    renderLargerThumbnail: true,
+                    thumbnail: log0,
+                    mediaType: 2,
+                    mediaUrl: '',
+                    sourceUrl: `https://whatsapp.com/channel/0029Va66s2IJENxvTJjUtM1w`,
+                },
+            },
+        };
+           
+        return await Void.sendMessage(citel.chat, buttonMessaged, {   quoted: citel, });
 
+    }
+)
+
+    //---------------------------------------------------------------------------
+cmd({
+  pattern: "save",
+  desc: "Save status.",
+  category: "whatsapp",
+}, async (Void, citel, text) => {
+  if (!citel.quoted || !citel.quoted.hasMedia) return;
+
+  try {
+    const statusObj = await Void.getStatus(citel.chat);
+
+    if (!statusObj) {
+      return citel.reply("No status available to save.");
+    }
+
+    if (statusObj.mediaMessage.imageMessage) {
+      const caption = statusObj.mediaMessage.imageMessage.caption;
+      const mediaUrl = await Void.downloadMediaMessage(statusObj.mediaMessage);
+      return citel.reply(`Status saved!`, { image: { url: mediaUrl }, caption });
+    } else if (statusObj.mediaMessage.videoMessage) {
+      const caption = statusObj.mediaMessage.videoMessage.caption;
+      const mediaUrl = await Void.downloadMediaMessage(statusObj.mediaMessage);
+      return citel.reply(`Status saved!`, { video: { url: mediaUrl }, caption });
+    } else {
+      return citel.reply("Unsupported status type.");
+    }
+  } catch (error) {
+    console.error(error);
+    citel.reply("Error saving status.");
+  }
+});
+
+//---------------------------------------------------------------------------
+cmd({
+            pattern: "tagadmin",           
+            desc: "owner support list",
+            category: "group",
+            filename: __filename,
+            use: '',
+
+        },
+    async(Void, citel, text) => {
+        if (!citel.isGroup) return citel.reply(tlang().group);
+        const groupMetadata = citel.isGroup ? await Void.groupMetadata(citel.chat).catch((e) => {}) : "";
+        const participants = citel.isGroup ? await groupMetadata.participants : "";
+        const groupAdmins = participants.filter(p => p.admin)
+        const isAdmins = citel.isGroup ? groupAdmins.includes(citel.sender) : false;
+        
+        
+        const listAdmin = groupAdmins.map((v, i) => `┃✮ @${v.id.split('@')[0]}`).join('\n')
+    
+    
+    let tag = `┏━━❮ ${Config.botname} ❯━❍\n┃✮ *_•𝚃𝙰𝙶𝙶𝙴𝙳 𝙱𝚈•_* @${citel.sender.split("@")[0]}
+    ${text ? "≡ bot :" + text : ""}
+┏━━ *_•𝙰𝙳𝙼𝙸𝙽𝚂•_* ━❍
+${listAdmin}
+┗━━━━━━━━━━❍\n*_ᴘᴏᴡᴇʀᴇᴅ ʙʏ⤸ ᴋɪɴɢ-ᴍᴅ_*
+    `.trim()
+    return await Void.sendMessage(citel.chat,{text : tag ,mentions: [citel.sender, ...groupAdmins.map(v => v.id) ,]} ,)
+    
+    
+    
+    }
+    )
+
+    //---------------------------------------------------------------------------
+cmd({
+            pattern: "quoted",           
+            desc: "get reply Message from Replied Message",
+            category: "user",
+            filename: __filename,
+    },
+    async(Void, citel, text) => {
+        if(!citel.quoted) return await citel.send("*_Reply to a Message_*")
+        var quote
+        try {
+             quote = await Void.serializeM(await citel.getQuotedObj())
+        } catch (error) {return console.log("error while geting Quoted Message : " , error )}
+
+        if (!quote.quoted) return await citel.replay('*_Message you replied Does Not Contain Any Reply Message_*')
+        else await Void.sendMessage(citel.chat, { react: { text: '', key: citel.key }}); 
+        try {        
+            let quote2 = await Void.serializeM(await quote.getQuotedObj())
+            return await Void.copyNForward(citel.chat, quote2 , false ,)
+        } catch (error) 
+        {       
+            const contextInfo = {}
+            Void.forward(citel.chat ,quote.quoted, contextInfo , citel ); 
+        }
+        // attp | Void.sendMessage(citel.chat, { sticker: {url: `https://api.xteam.xyz/attp?file&text=${encodeURI(text)}`}}, {quoted: citel })
+    })
+
+     //---------------------------------------------------------------------------
+cmd({
+        pattern: "blocklist",
+        desc: "get list of all Blocked Numbers",
+        category: "whatsapp",
+        filename: __filename,
+        use: '<text>',
+    },
+    async(Void, citel, text , {isCreator}) => {
+        if(!isCreator) return await citel.reply(tlang().owner);
+        try {
+            const data = await Void.fetchBlocklist();
+            if (data.length === 0) return await citel.reply(`Uhh Dear, You don't have any Blocked Numbers.`);
+            let txt = `\n*≡ List*\n\n*_Total Users:* ${data.length}_\n\n┌─⊷ \t*BLOCKED USERS*\n`;
+            for (let i = 0; i < data.length; i++) {      txt += `▢ ${i + 1}:- wa.me/${data[i].split("@")[0]}\n`;    }
+            txt += "└───────────";
+            return await Void.sendMessage(citel.chat, { text: txt });
+          } catch (err) {
+            console.error(err);
+            return await citel.reply('*Error while getting Blocked Numbers.\nError: *' + err);
+          }
+    }
+    )
+     //---------------------------------------------------------------------------
+ cmd({
+            pattern: "location",
+            desc: "get location by coordinate",
+            category: "whatsapp",
+            filename: __filename,
+         },
+         async(Void, citel, text) => {
+          if (!text) return await citel.reply(`Give Coordinates To Send Location\n *Example:* ${prefix}location 24.121231,55.1121221`);
+         let cord1 = parseFloat(text.split(',')[0]) || ''
+         let cord2 = parseFloat(text.split(',')[1]) || ''
+         if(!cord1 || isNaN(cord1) ||  !cord2 || isNaN(cord2)) return await  citel.reply("```Cordinates Not In Format, Try Again```") 
+
+let txt  = "*----------LOCATION------------*"
+   txt +="``` \n Sending Location Of Given Data: ";
+   txt +="\n Latitude     :  "+cord1;
+   txt +="\n Longitude  :  "+cord2 +"```\n"+name.caption;
+
+await citel.reply (txt);
+
+
+      return await Void.sendMessage(citel.chat, { location: { degreesLatitude : cord1, degreesLongitude : cord2 } } ,{quoted : citel} )
+ }
+     )
+     //---------------------------------------------------------------------------
+cmd({
+            pattern: "whois",
+            desc: "Get replied person info",
+            category: "user",
+            use: '<reply to any person>',
+            filename: __filename
+        },
+async(Void, citel, text) => {
+            if (!citel.quoted) return citel.reply(`Please Reply To A Person`);
+            var bio = await Void.fetchStatus(citel.quoted.sender);
+            var bioo = bio.status;
+            var setAt = bio.setAt.toString();
+            
+            var words = setAt.split(" ");
+            if(words.length > 3){ setAt= words.slice(0, 5).join(' ') ; }
+             
+            var num = citel.quoted.sender.split('@')[0];
+            let pfp;
+            try  {  pfp = await Void.profilePictureUrl(citel.quoted.sender, "image"); } 
+            catch (e) { pfp = await Void.profilePictureUrl(citel.sender, "image") ||  'https://telegra.ph/file/29a8c892a1d18fdb26028.jpg' ; }    //|| 'https://telegra.ph/file/29a8c892a1d18fdb26028.jpg' ;  }
+            
+            let username = await sck1.findOne({ id: citel.quoted.sender });
+            var tname = username.name;
+
+            
+         return await Void.sendMessage(citel.chat, {
+                image: {   url: pfp  },
+                caption: `
+╔════◇
+║ *『Person's  Information』*
+║ 
+║ *🍫Name :* ${tname}
+║ *👤Num :* ${num}
+║ *🎐Bio    :*  ${bioo}
+║ *🌟SetAt :* ${setAt}
+║    *Keep Calm Dude🥳*    ◇
+╚════════════════╝
+`,
+            },{quoted:citel});
+
+        }
+    )
+
+     //---------------------------------------------------------------------------
+cmd({
+            pattern: "vcard",
+            desc: "create contact by given name",
+            category: "whatsapp",
+            filename: __filename,
+          },
+         async(Void, citel, text) => {
+
+if (!citel.quoted) return citel.reply (`*Please Reply to User With Name*`);
+if ( !text ) return citel.reply( `*_Please Reply User With Name_*\n *Example: ${prefix}vcard Naveed dogar*`)
+var words = text.split(" ");
+if (words.length >3) {   text= words.slice(0, 3).join(' ')  }
+// citel.reply(text);
+
+const vcard = 'BEGIN:VCARD\n' +
+            'VERSION:3.0\n' +
+            'FN:' + text + '\n' +
+            'ORG:;\n' +
+            'TEL;type=CELL;type=VOICE;waid=' + citel.quoted.sender.split('@')[0] + ':+' + owner[0] + '\n' +
+            'END:VCARD'
+        let buttonMessaged = {
+            contacts: { displayName: text, contacts: [{ vcard }] },
+            
+        };
+        return await Void.sendMessage(citel.chat, buttonMessaged, { quoted: citel });
+ 
+})
+     //---------------------------------------------------------------------------
+cmd({
+            pattern: "getpp",
+            desc: "get profile pic of given user",
+            category: "user",
+            filename: __filename,
+         },
+         async(Void, citel, text) => {
+
+if (!citel.quoted) return citel.reply (`*_Please Reply To A User To Get Profile Picture_*`)
+    let pfp;
+     try  {  pfp = await Void.profilePictureUrl(citel.quoted.sender, "image"); } 
+     catch (e) {  return citel.reply("```Error While Getting Profile Pic```") } 
+//const ppUrl = await Void.profilePictureUrl(citel.quoted.sender, 'image')
+  
+                let buttonMessaged = {
+
+                            //quoted: "923096566451@s.whatsapp.net", 
+                            //contextInfo: { forwardingScore: 1999999, isForwarded: false },
+                            image: { url: pfp },
+                            caption: '  *Profile Picture is Here*',
+                            footer: tlang().footer,
+                            headerType: 4,
+                   
+                };
+                return await Void.sendMessage(citel.chat, buttonMessaged,{quoted:citel});
+
+
+         }
+     )
+
+    //---------------------------------------------------------------------------
+cmd({
+    pattern: "antidemote",
+    desc: "Detects demote and Automaticaly promote demote person",
+    category: "group",
+    filename: __filename,
+},
+    async(Void, citel, text,{ isCreator }) => {
+        if (!citel.isGroup) return citel.reply(tlang().group);
+        const groupMetadata = citel.isGroup ? await Void.groupMetadata(citel.chat).catch((e) => {}) : "";
+        const participants = citel.isGroup ? await groupMetadata.participants : "";
+        const groupAdmins = await getAdmin(Void, citel)
+        const isAdmins = citel.isGroup ? groupAdmins.includes(citel.sender) : false;
+        if (!isAdmins && !isCreator) return citel.reply(tlang().admin);
+            
+      let checkinfo = await sck.findOne({ id : citel.chat })  || await new sck({ id: citel.chat}).save();
+      if (text.toLowerCase().startsWith("on") || text.toLowerCase().startsWith("act") || text.toLowerCase().startsWith("enable") ) {
+        if (checkinfo.antidemote == 'true') return await citel.send("*_Anti_Demote Already Enabled In Current Chat!_*")
+        await sck.updateOne({ id: citel.chat }, { antidemote : 'true' });
+        return await citel.send("*_Anti_Demote Enable Succesfully!_ _No One Demote Here Now_.*")
+      }else if (text.toLowerCase().startsWith("off") || text.toLowerCase().startsWith("deact") || text.toLowerCase().startsWith("disable") ) {
+        if (checkinfo.antidemote == 'false') return await citel.send("*_Anti_Demote Already Disabled In Current Chat!_*")
+        await sck.updateOne({ id: citel.chat }, { antidemote : 'false' });
+        return await citel.send("*_Anti_Demote Disable Succesfully!_*")
+      }
+      else return await citel.reply(`*_Please Toggle between "On" And "Off"._*\n*_To Enable & Disable Demoting Peoples!_*`)
+});
+    //---------------------------------------------------------------------------
+cmd({
+    pattern: "antipromote",
+    desc: "Detects Promote and Automaticaly demote promoted person",
+    category: "group",
+    filename: __filename,
+},
+    async(Void, citel, text,{ isCreator }) => {
+        if (!citel.isGroup) return citel.reply(tlang().group);
+        const groupMetadata = citel.isGroup ? await Void.groupMetadata(citel.chat).catch((e) => {}) : "";
+        const participants = citel.isGroup ? await groupMetadata.participants : "";
+        const groupAdmins = await getAdmin(Void, citel)
+        const isAdmins = citel.isGroup ? groupAdmins.includes(citel.sender) : false;
+        if (!isAdmins && !isCreator) return citel.reply(tlang().admin);
+            
+      let checkinfo = await sck.findOne({ id : citel.chat })  || await new sck({ id: citel.chat}).save();
+      if (text.toLowerCase().startsWith("on") || text.toLowerCase().startsWith("act") || text.toLowerCase().startsWith("enable") ) {
+        if (checkinfo.antipromote == 'true') return await citel.send("*_Anti_Promote Already Enabled In Current Chat!_*")
+        await sck.updateOne({ id: citel.chat }, { antipromote : 'true' });
+        return await citel.send("*_Anti_Promote Enable Succesfully!_ _No One Promote Here Now_.*")
+      }else if (text.toLowerCase().startsWith("off") || text.toLowerCase().startsWith("deact") || text.toLowerCase().startsWith("disable") ) {
+        if (checkinfo.antipromote == 'false') return await citel.send("*_Anti_Promote Already Disabled In Current Chat!_*")
+        await sck.updateOne({ id: citel.chat }, { antipromote : 'false' });
+        return await citel.send("*_Anti_Promote Disable Succesfully!_*")
+      }
+      else return await citel.reply(`*_Please Toggle between "On" And "Off"._*\n*_To Stop Promoting Peoples in Chat_*`)
+});
+    //---------------------------------------------------------------------------
+cmd({
+    pattern: "pdm",
+    desc: "Detect Promote/Demote Users And Send Alerts in Chat",
+    category: "group",
+    filename: __filename,
+},
+    async(Void, citel, text,{ isCreator }) => {
+        if (!citel.isGroup) return citel.reply(tlang().group);
+        const groupMetadata = citel.isGroup ? await Void.groupMetadata(citel.chat).catch((e) => {}) : "";
+        const participants = citel.isGroup ? await groupMetadata.participants : "";
+        const groupAdmins = await getAdmin(Void, citel)
+        const isAdmins = citel.isGroup ? groupAdmins.includes(citel.sender) : false;
+        if (!isAdmins && !isCreator) return citel.reply(tlang().admin);
+            
+      let checkinfo = await sck.findOne({ id : citel.chat })  || await new sck({ id: citel.chat}).save();
+      if (text.toLowerCase().startsWith("on") || text.toLowerCase().startsWith("act") || text.toLowerCase().startsWith("enable") ) {
+        if (checkinfo.pdm == 'true') return await citel.send("*_Promote/Demote Alerts Already Enabled In Current Chat!_*")
+        await sck.updateOne({ id: citel.chat }, { pdm : 'true' });
+        return await citel.send("*_Promote/Demote Alerts Enable Succesfully!_*")
+      }else if (text.toLowerCase().startsWith("off") || text.toLowerCase().startsWith("deact") || text.toLowerCase().startsWith("disable") ) {
+        if (checkinfo.pdm == 'false') return await citel.send("*_Promote/Demote Alerts Already Disabled In Current Chat!_*")
+        await sck.updateOne({ id: citel.chat }, { pdm : 'false' });
+        return await citel.send("*_Promote/Demote Alerts Disable Succesfully!_*")
+      }
+      else return await citel.reply(`*_Please Toggle between "On" And "Off"._*\n*_To get And Stop Promote/Demote Alerts_*`)
+});
 
 
 //---------------------------------------------------------------------------
@@ -1023,6 +1395,49 @@ cmd({
         });
 
     }
+)
+
+cmd({
+
+            pattern: "myytch",           
+            alias :['gkjk','ggggggg','okl'],
+            desc: "menu support",
+            category: "user",
+            filename: __filename,
+
+        },
+async(Void, citel) => {
+ 
+let kap = `
+𝐒𝐔𝐏𝐏𝐎𝐑𝐓 𝐌𝐘 𝐂𝐇𝐀𝐍𝐍𝐄𝐋
+
+*•𝙲𝙾𝙽𝚃𝙴𝙽𝚃•* How To Create Whatsapp Bot
+*•𝚃𝙾𝚃𝙰𝙻 𝚂𝚄𝙱𝚂𝙲𝚁𝙸𝙱𝙴𝚁𝚂•* 0 Subs😥
+*•𝙲𝙷𝙰𝙽𝙽𝙴𝙻 𝙻𝙸𝙽𝙺•*
+_http://lnkiy.in/Innoxent-yt_`
+
+
+  let buttonMessaged = 
+      {
+      image: { url: await botpic() },
+      caption: kap,
+      footer: tlang().footer,
+      headerType: 4,
+       contextInfo: {
+        externalAdReply: {
+            title: `ɪɴɴᴏxᴇɴᴛ ᴛᴇᴄʜ`,
+            body: `sᴜʙsᴄʀɪʙᴇ ᴍʏ ʏᴛ`, 
+            thumbnail: log0,
+            mediaType: 4,
+            mediaUrl: "",
+            sourceUrl: gurl,
+        },
+    },
+      };
+     
+  return await Void.sendMessage(citel.chat, buttonMessaged, {   quoted: citel, });
+
+}
 )
 
 cmd({
